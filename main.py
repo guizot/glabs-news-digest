@@ -94,44 +94,44 @@ def build_summarizer_prompt(articles):
             f"{i}. [{a['source']}] {a['title']} ({ts})\n"
             f"   {a['url']}"
         )
-    joined = "\n".join(lines)
 
-    title = f"📰 Tech News Digest (Last 24h) — {today_label()}"
+    joined = "\n".join(lines)
+    title = f"📰 Tech News Digest (24 Jam Terakhir) — {today_label()}"
 
     return f"""
-You are a professional tech news editor writing for a Telegram channel.
+Anda adalah editor berita teknologi profesional untuk sebuah channel Telegram.
 
-Rules:
-- Output using TELEGRAM HTML formatting.
-- Write EXACTLY 5 news items.
-- For EACH news item:
-  - Start with an emoji
-  - Use <b>bold</b> for the headline title
-  - On the next line, include ONE plain URL (clickable)
-  - Then write ONE paragraph of 4–6 sentences
-- Do NOT use Markdown.
-- Do NOT invent URLs.
-- Do NOT include URLs inside paragraphs.
-- Merge duplicate stories.
-- Tone: professional, informative.
+ATURAN:
+- Gunakan format TELEGRAM HTML.
+- Tulis TEPAT 5 berita.
+- Untuk SETIAP berita:
+  - Awali dengan emoji
+  - Gunakan <b>bold</b> untuk judul headline
+  - Tulis SATU paragraf ringkasan sepanjang 4–6 kalimat
+  - LETAKKAN tautan DI BAWAH paragraf dalam format:
+    <a href="URL">Baca selengkapnya</a>
+- Jangan gunakan Markdown.
+- Jangan mengarang URL.
+- Jangan menampilkan URL mentah.
+- Gabungkan berita duplikat atau sangat mirip.
+- Gaya bahasa: profesional dan informatif.
 
-Required format:
+FORMAT WAJIB:
 
 <b>{title}</b>
 
-🚀 <b>Headline title</b>
-https://example.com/article
+🚀 <b>Judul Headline</b>
+Paragraf ringkasan 3-4 kalimat dalam Bahasa Indonesia.
+<a href="https://example.com">Baca selengkapnya</a>
 
-Paragraph summary text with 4–6 sentences.
-
-(Repeat until 5 items)
+(Ulangi hingga 5 berita)
 
 —
-🤖 Auto-generated AI summary  
-📡 Sources: TechCrunch, The Verge, Wired, Ars Technica  
-⏰ Updated daily at 08:00 (Jakarta time)
+🤖 Ringkasan otomatis AI  
+📡 Sumber: TechCrunch, The Verge, Wired, Ars Technica  
+⏰ Diperbarui setiap hari pukul 08.00 WIB
 
-Articles:
+DAFTAR ARTIKEL:
 {joined}
 """.strip()
 
@@ -150,7 +150,7 @@ def summarize_digest(articles):
             {"role": "user", "content": prompt},
         ],
         temperature=0.3,
-        max_tokens=900,
+        max_tokens=1200,
     )
     return (resp.choices[0].message.content or "").strip()
 

@@ -83,8 +83,14 @@ def fetch_last_24h_articles():
     ordered = sorted(items.values(), key=lambda x: x["published_at"], reverse=True)
     return ordered[:MAX_ARTICLES]
 
+WIB = timezone(timedelta(hours=7))
+
 def today_label() -> str:
     return datetime.now(timezone.utc).strftime("%b %d, %Y")
+
+def wib_timestamp() -> str:
+    now_wib = datetime.now(WIB)
+    return now_wib.strftime("%d %B %Y pukul %H.%M WIB")
 
 def build_summarizer_prompt(articles):
     lines = []
@@ -129,7 +135,7 @@ Paragraf ringkasan 3-4 kalimat dalam Bahasa Indonesia.
 —
 🤖 Ringkasan otomatis AI  
 📡 Sumber: TechCrunch, The Verge, Wired, Ars Technica  
-⏰ Diperbarui setiap hari pukul 08.00 WIB
+⏰ Di rangkum pada tanggal {wib_timestamp()}
 
 DAFTAR ARTIKEL:
 {joined}

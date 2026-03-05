@@ -1,12 +1,17 @@
 import os
+import ssl
 import hashlib
 from datetime import datetime, timezone, timedelta
 
+import certifi
 import feedparser
 import requests
 from dateutil import parser as dateparser
 from dotenv import load_dotenv
 from openai import OpenAI
+
+# Fix SSL certificate verification on macOS
+ssl._create_default_https_context = lambda: ssl.create_default_context(cafile=certifi.where())
 
 load_dotenv()
 
@@ -17,7 +22,7 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID", "")
 
-DIGEST_TITLE = os.getenv("DIGEST_TITLE", "📰 Tech News Digest (Last 24h)")
+DIGEST_TITLE = os.getenv("DIGEST_TITLE", "<b>📰 Tech News Digest (Last 24h)</b>")
 MAX_ARTICLES = int(os.getenv("MAX_ARTICLES", "25"))
 
 # RSS sources (you can add/remove)
@@ -58,7 +63,10 @@ def fetch_last_24h_articles():
     items = {}
 
     for feed_url in RSS_FEEDS:
-        parsed = feedparser.parse(feed_url)
+        parsed = feedparser.parse(
+            feed_url,
+            agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        )
         source_name = (parsed.feed.get("title") or "Unknown").strip()
 
         for e in parsed.entries:
@@ -206,7 +214,7 @@ def main():
 
     articles = fetch_last_24h_articles()
     if not articles:
-        telegram_send_html(f"**{DIGEST_TITLE}**\n\nNo notable tech items found in the last 24 hours.")
+        telegram_send_html(f"{DIGEST_TITLE}\n\nNo notable tech items found in the last 24 hours.")
         return
 
     digest = summarize_digest(articles)
